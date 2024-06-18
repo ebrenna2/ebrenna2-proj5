@@ -36,18 +36,46 @@ int main(void) {
     al_init_font_addon();
     al_init_ttf_addon();
 
-    //create the display and allegro font
-    ALLEGRO_DISPLAY* display = al_create_display(WIDTH, HEIGHT);
-    ALLEGRO_FONT* font = al_load_ttf_font("AppleGaramond.ttf", 24, 0);
-
-    // Initialize levels - num 1 first, 3 total
-    Levels levels;
-    levels.init(1, 3, WIDTH, HEIGHT);
-
     // Initialize timers and event queue - oen timer for fps and one for the game
     ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
     ALLEGRO_TIMER* fps_timer = al_create_timer(1.0 / 60);
     ALLEGRO_TIMER* game_timer = al_create_timer(1.0);
+
+    //create the display and allegro font
+    ALLEGRO_DISPLAY* display = al_create_display(WIDTH, HEIGHT);
+    ALLEGRO_FONT* font = al_load_ttf_font("AppleGaramond.ttf", 24, 0);
+
+    ALLEGRO_BITMAP* introImage = al_load_bitmap("fishyescape.png");
+    if (!introImage) {
+        return -1;
+    }
+
+    al_draw_bitmap(introImage, 0, 0, 0);
+    al_flip_display();
+
+    ALLEGRO_EVENT ev;
+    bool enterPressed = false;
+    while (!enterPressed) {
+        al_wait_for_event(event_queue, &ev);
+        if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+            if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
+            {
+                enterPressed = true;
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+            {
+                return 0;
+            }
+        }
+
+        else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            return 0;
+        }
+    }
+
+    // Initialize levels - num 1 first, 3 total
+    Levels levels;
+    levels.init(1, 3, WIDTH, HEIGHT);
 
     // Register event sources, fps timer and game timer, and keyboard
     al_register_event_source(event_queue, al_get_timer_event_source(fps_timer));
